@@ -20,6 +20,7 @@ The dataset I used in this project is the **Coffee** file which comes from the *
 )
 
 # **2. Outcome Variable**
+
 ```{r}
 library(ggplot2)
 ggplot(coffee) +  geom_histogram(aes(x=Rating), binwidth=1, col='black', fill='chocolate4') + labs(x='Rating of Coffee', title = 'Distribution of Rating', y = 'Frequency') + theme_minimal()
@@ -65,7 +66,7 @@ The correlation of this graph is **`r round(cor(coffee$Bagsper1000, coffee$Ratin
 
 #### **Multivariate Plot**
 ```{r}
-ggplot(coffee, aes(x = Altitude, y = Rating, color = ProcessingMethod)) + geom_point(alpha = 0.6) + labs(title = "Coffee Rating by Altitude and Processing Method", x = "Altitude (meters)", y = "Rating") + theme_minimal() + scale_color_manual(values = c("Natural / Dry" = "brown4", "Washed / Wet" = "forestgreen"))
+ggplot(coffee, aes(x = Altitude, y = Rating, color = ProcessingMethod)) + geom_point(alpha = 0.6) + labs(title = "Coffee Rating by Altitude and Processing Method", x = "Altitude (meters)", y = "Rating") + theme_minimal() + scale_color_manual(values = c("Natural / Dry" = "goldenrod1", "Washed / Wet" = "forestgreen"))
 ```
 
 This multivariate plot shows the relationship between coffee rating by altitude and processing method. The ratings tend to rise with altitude, and the pattern differs slightly by processing method.
@@ -85,7 +86,3 @@ Overall, in this coffee dataset, I have discovered that altitude shows a small p
 [CORGIS. “Coffee (CSV Dataset).”](https://corgis-edu.github.io/corgis/csv/coffee/)
 
 [TidyTuesday Coffee Readme.](https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2020/2020-07-07)
-
-
-
-
