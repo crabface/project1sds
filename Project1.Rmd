@@ -1,0 +1,91 @@
+---
+title: "Project 1 - SDS 313"
+author: "Neha Lazar"
+date: "2025-09-24"
+output: html_document
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+options(digits = 2)
+coffee = read.csv('Project1_coffee.csv')
+```
+
+# **1. Introduction**
+The dataset I used in this project is the **Coffee** file which comes from the **CORGIS Dataset Project.** This dataset was collected by the Coffee Quality Institute and compiled into CORGIS by Austin Cory Bart and others. It includes information on both Arabica and Robusta coffees produced in countries around the world. The dataset also includes descriptors of production, such as species, processing method, and altitude. The outcome variable of interest is the **rating** as it describes the overall quality score assigned to each coffee. The predictor variables I will be investigating include Processing Method, Altitude, and Bags produced per 1000 meters, since these capture the influence of production technique, growing environment, and production intensity adjusted for elevation.
+
+![](coffee.jpg)
+
+*Source: Caffelab, “Coffee Cupping”* [Click here](https://caffelab.com/cupping-spoon-professional/
+)
+
+# **2. Outcome Variable**
+```{r}
+library(ggplot2)
+ggplot(coffee) +  geom_histogram(aes(x=Rating), binwidth=1, col='black', fill='chocolate4') + labs(x='Rating of Coffee', title = 'Distribution of Rating', y = 'Frequency') + theme_minimal()
+
+rateMin = min(coffee$Rating, na.rm = TRUE)
+rateMax = max(coffee$Rating, na.rm = TRUE)
+rateMean = mean(coffee$Rating, na.rm = TRUE)
+rateMedian = median(coffee$Rating, na.rm = TRUE)
+rateSd = sd(coffee$Rating, na.rm = TRUE)
+```
+
+The Rating number ranges from **`r round(rateMin,2)`** to **`r round(rateMax,2)`** which is quite varied for the ratings. The mean is **`r round(rateMean,2)`**, the median is **`r round(rateMedian,2)`** and slightly higher. Finally, the standard deviation is **`r round(rateSd,2)`** which indicates a substantial spread. The distribution is bell-shaped but skewed left slightly with a lot of lower ratings reaching below 70. The professional cuppings tend to score most coffees as “very good” with only a handful judged as exceptional or poor.
+
+# **3. Bivariate Analyses** 
+## **Graph 1**
+```{r}
+ggplot(coffee, aes(x = Altitude, y = Rating)) + geom_point(alpha = 0.6, color = "brown4", pch = 20) + labs(title = "Coffee Rating by Altitude", x = "Altitude (meters)", y = "Rating") + theme_minimal()
+```
+
+The correlation of this graph is **`r round(cor(coffee$Altitude, coffee$Rating),2)`**, which tells us that there is almost no relationship between the altitude from where the beans were picked and the rating of the coffee overall. 
+
+## **Graph 2**
+```{r}
+coffee_midalt = subset(coffee, Altitude >= 1000 & Altitude <= 2000)
+ggplot(coffee_midalt, aes(x = ProcessingMethod, y = Rating)) + geom_boxplot(fill = "forestgreen") + labs(title = "Coffee Rating by Processing Method", x = "Processing Method", y = "Rating") + theme_minimal()
+
+pm_p = t.test(Rating ~ ProcessingMethod, data = coffee_midalt)$p.value
+pm_med = tapply(coffee_midalt$Rating, coffee_midalt$ProcessingMethod, median, na.rm = TRUE)
+```
+
+For this graph, I used a **subset** of the coffee dataset focusing on specifically the beans from the altitude at 1000 to 2000 meters. I then compared the Rating with the Processing Method and there were two specific types mentioned - Natural / Dry and Washed / Wet there appears to be --. Median ratings by method: **`r round(pm_med[1],2)`** vs **`r round(pm_med[2],2)`**. And the p value is **`r signif(pm_p, 3)`**.
+
+## **Graph 3**
+```{r}
+coffee$Bagsper1000 = coffee$BagsProduced / (coffee$Altitude / 1000)
+ok = is.finite(coffee$Bagsper1000) & !is.na(coffee$Rating)
+
+ggplot(coffee, aes(x = coffee$Bagsper1000, y = Rating)) + geom_point(color = "goldenrod1") + labs(title = "Coffee Rating by Bags Produced per 1000 meters", x = "Bags Produced per 1000 meters",y = "Rating" ) + theme_minimal() 
+```
+
+The correlation of this graph is **`r round(cor(coffee$Bagsper1000, coffee$Rating))`**, which tells us that there is essentially no relationship between the outcome variable (Rating) and the new predictor variable which is bags produced per 1000 meters.
+
+
+#### **Multivariate Plot**
+```{r}
+ggplot(coffee, aes(x = Altitude, y = Rating, color = ProcessingMethod)) + geom_point(alpha = 0.6) + labs(title = "Coffee Rating by Altitude and Processing Method", x = "Altitude (meters)", y = "Rating") + theme_minimal() + scale_color_manual(values = c("Natural / Dry" = "brown4", "Washed / Wet" = "forestgreen"))
+```
+
+This multivariate plot shows the relationship between coffee rating by altitude and processing method. The ratings tend to rise with altitude, and the pattern differs slightly by processing method.
+
+# **4. Choice Elements**
+I used more than 2 inline code reports because I wanted to write down the descriptors inside of the analysis such as mean median and other statistics to describe my graph and data. These inline reports were used in the first graph - histogram of the coffee ratings and the second graph which is a bivariate plot that includes the altitude (predictor variable) in comparison with the outcome variable - rating. I used a hyperlink for the source in the image and dataset in order to guide users to the exact page and details of where i acquired this image and dataset and its materials for analysis I used. I placed another hyperlink to further explain the BLANK variable. I changed the font style and made it bold on certain parts of the text in order to emphasize the text and highlight what specific variables I chose or where I got my data from. I made a new predictor variable which depicted the Bags produce per 1000 meters to show more specific values over a narrowed range. The subset I made is coffee in a mid altitude range which was from 1000 to 2000 meters and then determined if the processing method or rating had any effects regarding the new stipulations.
+
+
+# **5. Conclusion**
+Overall, in this coffee dataset, I have discovered that altitude shows a small positive association with professional ratings. Processing method differs meaningfully in mid-altitude beans, and production intensity (bags per 1000 m) shows little direct association with rating. As well as for future analysis I suggest adding variables on bean variety, harvest year, and moisture to adjust for confounders. Secondly, I suggest to test an interaction between altitude and processing method to see if altitude advantages differ by method.
+
+### **References**
+[Caffelab. “Coffee Cupping” (image).](https://caffelab.com/cupping-spoon-professional/) 
+
+[Coffee Quality Institute. “Cupping Protocols and Scores.”]( https://www.coffeeinstitute.org)
+
+[CORGIS. “Coffee (CSV Dataset).”](https://corgis-edu.github.io/corgis/csv/coffee/)
+
+[TidyTuesday Coffee Readme.](https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2020/2020-07-07)
+
+
+
+
